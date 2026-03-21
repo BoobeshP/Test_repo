@@ -9,38 +9,39 @@ pipeline {
             }
         }
 
-        stage('Show Workspace') {
+        stage('Show Files') {
             steps {
                 sh '''
-                echo "===== CURRENT DIRECTORY ====="
+                echo "===== WORKSPACE ====="
                 pwd
-
-                echo "===== FILES IN WORKSPACE ====="
+                echo "===== FILE LIST ====="
                 ls -l
                 '''
             }
         }
 
-        stage('Run Python File') {
+        stage('Run Python Files') {
             steps {
                 sh '''
-                echo "===== TRYING TO RUN PYTHON FILE ====="
-                set -x
-                python3 hello.py
+                echo "===== RUNNING test.py ====="
+                python3 test.py
+
+                echo "===== RUNNING test1.py ====="
+                python3 test1.py
                 '''
             }
         }
 
-        stage('Run Java File') {
+        stage('Compile & Run Java') {
             steps {
                 sh '''
-                echo "===== TRYING TO RUN JAVA FILE ====="
-                set -x
-                javac Main.java
-                java Main
+                echo "===== COMPILING test2.java ====="
+                javac test2.java
+
+                echo "===== RUNNING test2 ====="
+                java test2
                 '''
             }
         }
     }
 }
-
