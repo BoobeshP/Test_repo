@@ -9,21 +9,33 @@ pipeline {
             }
         }
 
-        stage('Run Python') {
-            when {
-                expression { fileExists('hello.py') }
-            }
+        stage('Show Workspace') {
             steps {
-                sh 'python3 hello.py'
+                sh '''
+                echo "===== CURRENT DIRECTORY ====="
+                pwd
+
+                echo "===== FILES IN WORKSPACE ====="
+                ls -l
+                '''
             }
         }
 
-        stage('Run Java') {
-            when {
-                expression { fileExists('Main.java') }
-            }
+        stage('Run Python File') {
             steps {
                 sh '''
+                echo "===== TRYING TO RUN PYTHON FILE ====="
+                set -x
+                python3 hello.py
+                '''
+            }
+        }
+
+        stage('Run Java File') {
+            steps {
+                sh '''
+                echo "===== TRYING TO RUN JAVA FILE ====="
+                set -x
                 javac Main.java
                 java Main
                 '''
@@ -31,3 +43,4 @@ pipeline {
         }
     }
 }
+
