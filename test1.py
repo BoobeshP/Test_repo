@@ -1,1 +1,3 @@
-printf("Hey we r in Mphasis")
+
+print("Hello from Python file")
+print("Doing Great! It's running")

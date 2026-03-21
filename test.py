@@ -1,2 +1,1 @@
-printf("hi how r u!")
-
+print("Hi I'm from Python file")
