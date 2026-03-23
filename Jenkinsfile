@@ -11,11 +11,14 @@ pipeline {
         stage('Create Directory') {
             steps {
                 sh '''
-                if [ ! -d "$DIR_PATH" ]; then
-                    sudo mkdir -p "$DIR_PATH"
-                    echo "Directory created successfully"
+                echo "Creating directory..."
+                sudo mkdir -p "$DIR_PATH"
+
+                if sudo test -d "$DIR_PATH"; then
+                    echo "Directory created successfully ✅"
                 else
-                    echo "Directory already exists"
+                    echo "Directory creation failed ❌"
+                    exit 1
                 fi
                 '''
             }
@@ -24,11 +27,18 @@ pipeline {
         stage('Create File') {
             steps {
                 sh '''
-                if [ -d "$DIR_PATH" ]; then
+                echo "Creating file..."
+                if sudo test -d "$DIR_PATH"; then
                     sudo touch "$FILE_PATH"
-                    echo "File created successfully"
+
+                    if sudo test -f "$FILE_PATH"; then
+                        echo "File created successfully ✅"
+                    else
+                        echo "File creation failed ❌"
+                        exit 1
+                    fi
                 else
-                    echo "Directory does not exist"
+                    echo "Directory does not exist ❌"
                     exit 1
                 fi
                 '''
@@ -38,11 +48,13 @@ pipeline {
         stage('Change File Permission') {
             steps {
                 sh '''
-                if [ -f "$FILE_PATH" ]; then
-                   sudo chmod 755 "$FILE_PATH"
-                    echo "File permission changed successfully"
+                echo "Changing file permission..."
+                if sudo test -f "$FILE_PATH"; then
+                    sudo chmod 755 "$FILE_PATH"
+                    sudo ls -l "$FILE_PATH"
+                    echo "File permission changed successfully ✅"
                 else
-                    echo "File does not exist"
+                    echo "File does not exist ❌"
                     exit 1
                 fi
                 '''
@@ -52,10 +64,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline executed successfully ✅"
+            echo "✅ Pipeline executed successfully"
         }
         failure {
-            echo "Pipeline failed ❌"
+            echo "❌ Pipeline failed"
         }
     }
 }
