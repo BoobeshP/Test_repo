@@ -12,7 +12,7 @@ pipeline {
             steps {
                 sh '''
                 if [ ! -d "$DIR_PATH" ]; then
-                    mkdir -p "$DIR_PATH"
+                    sudo mkdir -p "$DIR_PATH"
                     echo "Directory created successfully"
                 else
                     echo "Directory already exists"
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 sh '''
                 if [ -d "$DIR_PATH" ]; then
-                    touch "$FILE_PATH"
+                    sudo touch "$FILE_PATH"
                     echo "File created successfully"
                 else
                     echo "Directory does not exist"
@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sh '''
                 if [ -f "$FILE_PATH" ]; then
-                    chmod 755 "$FILE_PATH"
+                   sudo chmod 755 "$FILE_PATH"
                     echo "File permission changed successfully"
                 else
                     echo "File does not exist"
