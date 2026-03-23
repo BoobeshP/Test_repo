@@ -1,22 +1,27 @@
 #!/bin/bash
 
+TARGET_DIR="/home/administrator/output"
+
 echo "==== Jenkins Freestyle Job Execution ===="
 echo "Date: $(date)"
-echo "User: $(whoami)"
-echo "Working directory: $(pwd)"
+echo "Running user: $(whoami)"
+echo "Target directory: $TARGET_DIR"
 
-echo "Creating directory..."
-mkdir -p output
+echo "Creating directory in administrator home..."
+sudo mkdir -p $TARGET_DIR
 
-echo "Writing output to file..."
-echo "Hello from Jenkins on $(hostname)" > output/result.txt
+echo "Writing output file..."
+echo "Hello from Jenkins on $(hostname)" | sudo tee $TARGET_DIR/result.txt > /dev/null
 
 echo "Setting permissions..."
-chmod 755 output
-chmod 644 output/result.txt
+sudo chmod 755 $TARGET_DIR
+sudo chmod 644 $TARGET_DIR/result.txt
 
-echo "Listing output directory with permissions:"
-ls -ld output
-ls -l output/result.txt
+echo "Changing ownership to administrator..."
+sudo chown -R administrator:administrator $TARGET_DIR
+
+echo "Verifying result..."
+ls -ld $TARGET_DIR
+ls -l $TARGET_DIR/result.txt
 
 echo "==== Script completed successfully ===="
