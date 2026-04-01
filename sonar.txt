@@ -1,0 +1,16 @@
+cd /opt
+sudo wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+
+
+sudo apt install -y unzip
+sudo unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+
+sudo mv sonar-scanner-5.0.1.3006-linux sonar-scanner
+
+sudo nano /etc/profile.d/sonar-scanner.sh
+
+export SONAR_SCANNER_HOME=/opt/sonar-scanner
+export PATH=$PATH:$SONAR_SCANNER_HOME/bin
+
+source /etc/profile.d/sonar-scanner.sh
+sonar-scanner -v
