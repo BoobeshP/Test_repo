@@ -1,0 +1,39 @@
+sudo nano /usr/local/nagios/etc/objects/friend.cfg
+
+###############################################################################
+# FRIEND SERVER CONFIG
+###############################################################################
+
+define host {
+    use             linux-server
+    host_name       friend-server
+    alias           Friend Server
+    address         192.168.1.50
+}
+
+define service {
+    use                     generic-service
+    host_name               friend-server
+    service_description     PING
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use                     generic-service
+    host_name               friend-server
+    service_description     SSH
+    check_command           check_ssh
+}
+
+define service {
+    use                     generic-service
+    host_name               friend-server
+    service_description     HTTP
+    check_command           check_http
+}
+sudo nano /usr/local/nagios/etc/nagios.cfg
+
+cfg_file=/usr/local/nagios/etc/objects/friend.cfg
+
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+sudo systemctl restart nagios
