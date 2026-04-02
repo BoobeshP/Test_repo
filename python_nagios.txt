@@ -1,0 +1,82 @@
+sudo mkdir -p /opt/0204
+sudo chown $USER:$USER /opt/0204
+cd /opt/0204
+
+nano app.py
+
+#!/usr/bin/env python3
+import time
+
+while True:
+    print("Python 0204 app running")
+    time.sleep(10)
+  
+chmod +x app.py
+python3 app.py   # Ctrl+C to stop
+
+sudo nano /etc/systemd/system/python-0204.service
+
+[Unit]
+Description=Python 0204 Application Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/0204/app.py
+WorkingDirectory=/opt/0204
+Restart=always
+RestartSec=5
+User=nagios
+Group=nagios
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable python-0204
+sudo systemctl start python-0204
+
+systemctl status python-0204
+#Create Nagios plugin
+sudo nano /usr/local/nagios/libexec/check_systemd_service
+
+#!/bin/bash
+SERVICE="$1"
+
+STATUS=$(systemctl is-active "$SERVICE")
+
+if [ "$STATUS" = "active" ]; then
+  echo "OK - $SERVICE service is running"
+  exit 0
+else
+  echo "CRITICAL - $SERVICE service is $STATUS"
+  exit 2
+fi
+
+sudo chmod +x /usr/local/nagios/libexec/check_systemd_service
+/usr/local/nagios/libexec/check_systemd_service python-0204
+
+sudo nano /usr/local/nagios/etc/objects/commands.cfg
+define command{
+    command_name    check_systemd_service
+    command_line    $USER1$/check_systemd_service $ARG1$
+}
+
+sudo nano /usr/local/nagios/etc/objects/localhost.cfg
+define service{
+    use                     local-service
+    host_name               localhost
+    service_description     Python 0204 Service
+    check_command           check_systemd_service!python-0204
+    check_interval          1
+    retry_interval          1
+}
+
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+sudo systemctl restart nagios
+
+
+
+
+
