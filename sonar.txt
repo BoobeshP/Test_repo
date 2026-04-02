@@ -77,3 +77,42 @@ sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+//config nagios
+sudo systemctl enable fcgiwrap
+sudo systemctl start fcgiwrap
+
+sudo nano /etc/nginx/sites-available/nagios
+
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/local/nagios/share;
+    index index.php;
+
+    location /nagios {
+        alias /usr/local/nagios/share;
+        index index.php;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+    }
+
+    location /nagios/cgi-bin {
+        alias /usr/local/nagios/sbin;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $request_filename;
+        fastcgi_pass unix:/run/fcgiwrap.socket;
+    }
+}
+
+ls /run/php/
+
+
+sudo ln -s /etc/nginx/sites-available/nagios /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
