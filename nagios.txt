@@ -52,3 +52,8 @@ command[check_procs]=/usr/lib/nagios/plugins/check_procs -w 250 -c 400
 sudo ufw allow from 192.168.156.19 to any port 5666
 sudo ufw reload
 sudo systemctl restart nagios-nrpe-server
+
+define command{
+    command_name    check_systemd_service
+    command_line    $USER1$/check_systemd_service $ARG1$
+}
