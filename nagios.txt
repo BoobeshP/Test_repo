@@ -37,3 +37,18 @@ cfg_file=/usr/local/nagios/etc/objects/friend.cfg
 
 sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 sudo systemctl restart nagios
+
+sudo apt update
+sudo apt install -y nagios-nrpe-server nagios-plugins
+systemctl status nagios-nrpe-server
+sudo nano /etc/nagios/nrpe.cfg
+allowed_hosts=allowed_hosts=127.0.0.1,192.168.156.19
+
+command[check_disk]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /
+command[check_load]=/usr/lib/nagios/plugins/check_load -w 5,4,3 -c 10,6,4
+command[check_mem]=/usr/lib/nagios/plugins/check_mem
+command[check_procs]=/usr/lib/nagios/plugins/check_procs -w 250 -c 400
+
+sudo ufw allow from 192.168.156.19 to any port 5666
+sudo ufw reload
+sudo systemctl restart nagios-nrpe-server
