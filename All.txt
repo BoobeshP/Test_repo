@@ -1,0 +1,63 @@
+systemctl status jenkins
+systemctl status docker
+systemctl status kubelet
+
+sudo nano /usr/local/nagios/libexec/check_systemd_service
+
+#!/bin/bash
+SERVICE="$1"
+
+STATUS=$(systemctl is-active "$SERVICE")
+
+if [ "$STATUS" = "active" ]; then
+  echo "OK - $SERVICE service is running"
+  exit 0
+else
+  echo "CRITICAL - $SERVICE service is $STATUS"
+  exit 2
+fi
+
+sudo chmod +x /usr/local/nagios/libexec/check_systemd_service
+
+/usr/local/nagios/libexec/check_systemd_service docker
+/usr/local/nagios/libexec/check_systemd_service jenkins
+/usr/local/nagios/libexec/check_systemd_service kubelet
+
+sudo nano /usr/local/nagios/etc/objects/commands.cfg
+
+define command{
+    command_name    check_systemd_service
+    command_line    $USER1$/check_systemd_service $ARG1$
+}
+
+sudo nano /usr/local/nagios/etc/objects/localhost.cfg
+
+define service{
+    use                     local-service
+    host_name               localhost
+    service_description     Jenkins Service
+    check_command           check_systemd_service!jenkins
+    check_interval          1
+    retry_interval          1
+}
+
+define service{
+    use                     local-service
+    host_name               localhost
+    service_description     Docker Service
+    check_command           check_systemd_service!docker
+    check_interval          1
+    retry_interval          1
+}
+
+define service{
+    use                     local-service
+    host_name               localhost
+    service_description     Docker Service
+    check_command           check_systemd_service!docker
+    check_interval          1
+    retry_interval          1
+}
+
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+sudo systemctl restart nagios
